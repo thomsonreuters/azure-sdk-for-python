@@ -562,20 +562,24 @@ class ServicePrincipalsOperations(object):
         :raises:
          :class:`GraphErrorException<azure.graphrbac.models.GraphErrorException>`
         """
-        def internal_paging(next_link=None, raw=False):
+        def internal_paging(next_link=None):
+            """paging through list of owners of a SPN"""
 
             if not next_link:
                 # Construct URL
                 url = '/{tenantID}/servicePrincipals/{objectId}/owners'
                 path_format_arguments = {
-                    'objectId': self._serialize.url("object_id", object_id, 'str', skip_quote=True),
-                    'tenantID': self._serialize.url("self.config.tenant_id", self.config.tenant_id, 'str')
+                    'objectId': self._serialize.url(
+                        "object_id", object_id, 'str', skip_quote=True),
+                    'tenantID': self._serialize.url(
+                        "self.config.tenant_id", self.config.tenant_id, 'str')
                 }
                 url = self._client.format_url(url, **path_format_arguments)
 
                 # Construct parameters
                 query_parameters = {}
-                query_parameters['api-version'] = self._serialize.query("self.api_version", self.api_version, 'str')
+                query_parameters['api-version'] = self._serialize.query(
+                    "self.api_version", self.api_version, 'str')
 
             else:
                 url = next_link
@@ -589,14 +593,15 @@ class ServicePrincipalsOperations(object):
             if custom_headers:
                 header_parameters.update(custom_headers)
             if self.config.accept_language is not None:
-                header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+                header_parameters['accept-language'] = self._serialize.header(
+                    "self.config.accept_language", self.config.accept_language, 'str')
 
             # Construct and send request
             request = self._client.get(url, query_parameters)
             response = self._client.send(
                 request, header_parameters, **operation_config)
 
-            if response.status_code not in [200]:
+            if response.status_code != 200:
                 raise models.GraphErrorException(self._deserialize, response)
 
             return response
@@ -606,7 +611,8 @@ class ServicePrincipalsOperations(object):
 
         if raw:
             header_dict = {}
-            client_raw_response = models.UserPaged(internal_paging, self._deserialize.dependencies, header_dict)
+            client_raw_response = models.UserPaged(
+                internal_paging, self._deserialize.dependencies, header_dict)
             return client_raw_response
 
         return deserialized
